@@ -63,7 +63,7 @@ class Deployer
 
     $pdo = new \PDO("mysql:dbname={$db};host={$host};charset=utf8", getenv('PW_DB_USER'), getenv('PW_DB_PASS'));
 
-    require $appRoot.'wire/core/WireDatabaseBackup.php';
+    require $appRoot.'vendor/sforsman/dpw/wire/core/WireDatabaseBackup.php';
 
     $backup = new \WireDatabaseBackup();
     $backup->setDatabase($pdo);
