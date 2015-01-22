@@ -48,7 +48,7 @@ class Deployer
     $db = getenv('PW_DB_NAME');
     $appRoot = getenv('HEROKU_APP_DIR').'/';
 
-    $pdo = new PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
+    $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
 
     $query = "SHOW DATABASES LIKE '{$name}'";
     $result = $pdo->query($query)->fetch();
@@ -61,7 +61,7 @@ class Deployer
 
     unset($pdo);
 
-    $pdo = new PDO("mysql:dbname={$db};host={$host};charset=utf8", getenv('PW_DB_USER'), getenv('PW_DB_PASS'));
+    $pdo = new \PDO("mysql:dbname={$db};host={$host};charset=utf8", getenv('PW_DB_USER'), getenv('PW_DB_PASS'));
 
     require $appRoot.'wire/core/WireDatabaseBackup.php';
 
