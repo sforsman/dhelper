@@ -23,16 +23,16 @@ class Deployer
 
     $master = self::getMasterDb();
 
-    if(self::databaseExists($master))
-    {
+    if(self::databaseExists($master)) {
       echo "Connecting to existing instance\n";
     }
-    else
-    {
+    else {
+      echo "Setting up a new instance\n";
       $pdo = self::setupDatabase($master);
       self::setupAdminUser($pdo);
-      self::createAppRoot();
     }
+    echo "Creating app root\n";
+    self::createAppRoot();
   }
 
   static protected function getMasterDb()
