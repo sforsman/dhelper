@@ -8,14 +8,20 @@ class Deployer
   {
   }
 
+  static public function getRoot()
+  {
+    return "/app";
+  }
+
+
   // This should be called in composer.json on post-install-cmd
   static public function postInstall()
   {
     // TODO: Dev-version (this supports Heroku-buildpack style only)
-    if(!getenv('HEROKU_APP_DIR'))
+    if(!getenv('PW_DB_HOST'))
       return;
 
-    $installLock = getenv('HEROKU_APP_DIR').'/.installed';
+    $installLock = self::getRoot().'/.installed';
     if(!file_exists($installLock))
     {
       echo "First-time installation detected\n";
@@ -28,7 +34,7 @@ class Deployer
 
   static protected function createAppRoot()
   {
-    $appRoot = getenv('HEROKU_APP_DIR').'/';
+    $appRoot = self::getRoot().'/';
     $componentRoot = $appRoot.'vendor/sforsman/';
     $cmds = [
       "cp -rp {$componentRoot}dpw/wire {$componentRoot}dpw/index.php {$componentRoot}dpw/.htaccess {$appRoot}",
@@ -46,7 +52,7 @@ class Deployer
   {
     $host = getenv('PW_DB_HOST');
     $db = getenv('PW_DB_NAME');
-    $appRoot = getenv('HEROKU_APP_DIR').'/';
+    $appRoot = self::getRoot().'/';
 
     $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
