@@ -84,12 +84,16 @@ class Deployer
 //      ],
     ];
 
-    if(!$backup->restoreMerge($wireRoot.'core/install.sql', $siteRoot.'install/install.sql', $options)) {
-      foreach($backup->errors() as $error) {
-        echo $error."\n";
-      }
-      throw new \Exception("Database creation failed");
+    $backup->restoreMerge($wireRoot.'core/install.sql', $siteRoot.'install/install.sql', $options);
+    $errors = false;
+
+    foreach($backup->errors() as $error) {
+      echo $error."\n";
+      $errors = true;
     }
+
+    if($errors)
+      throw new \Exception("Database creation failed");
 
     echo "-> Database created\n";
 
