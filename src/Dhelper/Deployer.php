@@ -49,6 +49,7 @@ class Deployer
     $appRoot = getenv('HEROKU_APP_DIR').'/';
 
     $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
     $query = "SHOW DATABASES LIKE '{$db}'";
     $result = $pdo->query($query)->fetch();
@@ -62,8 +63,12 @@ class Deployer
     unset($pdo);
 
     $pdo = new \PDO("mysql:dbname={$db};host={$host};charset=utf8", getenv('PW_DB_USER'), getenv('PW_DB_PASS'));
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-    require $appRoot.'vendor/sforsman/dpw/wire/core/WireDatabaseBackup.php';
+    $wireRoot = $appRoot.'vendor/sforsman/dpw/wire/';
+    $siteRoot = $appRoot.'vendor/sforsman/dsite/';
+
+    require $wireRoot.'core/WireDatabaseBackup.php';
 
     $backup = new \WireDatabaseBackup();
     $backup->setDatabase($pdo);
@@ -72,7 +77,13 @@ class Deployer
         'ENGINE=MyISAM' => 'ENGINE=InnoDB'
       ],
     ];
-    $backup->restoreMerge($appRoot.'wire/core/install.sql', $appRoot.'site/install/install.sql', $options);
+
+    if(!$backup->restoreMerge($wireRoot.'core/install.sql', $siteRoot.'install/install.sql', $options)) {
+      foreach($backup->errors() as $error) {
+        echo $error."\n";
+      }
+      throw new \Exception("Database creation failed");
+    }
 
     echo "-> Database created\n";
 
@@ -84,23 +95,36 @@ class Deployer
     $user = getenv('PW_ADMIN_USER');
     $pass = getenv('PW_ADMIN_PASS');
 
+    $superId = 41;
+
     // The template IDs etc are imported from site/install/install.sql, so currently
     // we can just count on them
-    $query = "INSERT INTO pages VALUES (NULL, 29, 3, ?, 1, NOW(), 2, NOW(), 2, 0)";
+    $query = "REPLACE INTO pages VALUES (?, 29, 3, ?, 1, NOW(), 2, NOW(), 2, 0)";
     $stmt = $pdo->prepare($query);
-    $stmt->execute($user);
+    $stmt->execute([$superId, $user]);
 
-    $page_id = $pdo->lastInsertId();
+    // $page_id = $pdo->lastInsertId();
+    $page_id = $superId;
 
     list($salt,$hash) = self::getHash($pass);
 
-    $query = "INSERT INTO field_pass VALUES(?,?,?)";
+    $query = "REPLACE INTO field_pass VALUES(?,?,?)";
     $stmt = $pdo->prepare($query);
     $stmt->execute([$page_id, $hash, $salt]);
 
-    $query = "INSERT INTO field_email VALUES (?,?)";
+    $query = "REPLACE INTO field_email VALUES (?,?)";
     $stmt = $pdo->prepare($query);
     $stmt->execute([$page_id, "example@example.com"]);
+
+    $query = "DELETE FROM field_roles WHERE pages_id=?";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$page_id]);
+
+    $query = "INSERT INTO field_roles VALUES (?,?,?)";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$superId,37,0]);
+    $stmt->execute([$superId,38,1]);
+
     echo "-> Admin user created\n";
   }
 
@@ -116,7 +140,7 @@ class Deployer
   {
     $salt = '$2y$11$';
     $salt.= self::randomBase64String(22);
-    $salt.= '$'; 
+    $salt.= '$';
     return $salt;
   }
 
@@ -156,7 +180,8 @@ class Deployer
     }
     $salt = str_replace('+', '.', base64_encode($buffer));
     $salt = substr($salt, 0, $requiredLength);
-    $salt .= $valid; 
+    $salt .= $valid;
     return $salt;
   }
 }
+
