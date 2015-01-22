@@ -31,8 +31,8 @@ class Deployer
     $appRoot = getenv('HEROKU_APP_DIR').'/';
     $componentRoot = $appRoot.'vendor/sforsman/';
     $cmds = [
-      "mv {$componentRoot}dpw/* {$componentRoot}dpw/.htaccess {$appRoot}",
-      "mv {$componentRoot}dsite/ {$appRoot}site",
+      "cp -rp {$componentRoot}dpw/wire {$componentRoot}dpw/index.php {$componentRoot}dpw/.htaccess {$appRoot}",
+      "cp -rp {$componentRoot}dsite/ {$appRoot}site",
     ];
     foreach($cmds as $cmd)
     {
