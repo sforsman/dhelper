@@ -79,9 +79,9 @@ class Deployer
     $backup = new \WireDatabaseBackup();
     $backup->setDatabase($pdo);
     $options = [
-//      'findReplaceCreateTable'=>[
-//        'ENGINE=MyISAM' => 'ENGINE=InnoDB'
-//      ],
+      'findReplaceCreateTable'=>[
+        'ENGINE=MyISAM' => 'ENGINE=InnoDB'
+      ],
     ];
 
     $backup->restoreMerge($wireRoot.'core/install.sql', $siteRoot.'install/install.sql', $options);
