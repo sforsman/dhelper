@@ -50,11 +50,11 @@ class Deployer
 
     $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
 
-    $query = "SHOW DATABASES LIKE '{$name}'";
+    $query = "SHOW DATABASES LIKE '{$db}'";
     $result = $pdo->query($query)->fetch();
 
     if($result !== false)
-      throw new \Exception("Database '{$name}' exists");
+      throw new \Exception("Database '{$db}' exists");
 
     $pdo->exec("CREATE DATABASE {$db}");
     $pdo->exec("GRANT ALL PRIVILEGES ON {$db}.* TO '".getenv('PW_DB_USER')."'@'%' IDENTIFIED BY '".getenv('PW_DB_PASS')."'");
