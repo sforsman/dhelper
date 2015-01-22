@@ -1,0 +1,21 @@
+{
+    "name": "sforsman/dhelper",
+    "description": "Helps to deploy PW instances",
+    "keywords": ["pw","processwire"],
+    "homepage": "http://github.com/sforsman/dhelper",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Forsman",
+            "email": "sebastian.forsman@gmail.com",
+            "homepage": "http://github.com/sforsman"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+    },
+    "autoload": {
+        "psr-4": {"Dhelper\\": "src/Dhelper"}
+    },
+}
