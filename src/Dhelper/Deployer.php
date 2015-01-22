@@ -79,8 +79,8 @@ class Deployer
     $backup = new \WireDatabaseBackup();
     $backup->setDatabase($pdo);
     $options = [
-      'findReplaceCreateTable'=>[
-        'ENGINE=MyISAM' => 'ENGINE=InnoDB'
+//      'findReplaceCreateTable'=>[
+//        'ENGINE=MyISAM' => 'ENGINE=InnoDB'
       ],
     ];
 
