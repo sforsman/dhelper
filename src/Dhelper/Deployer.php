@@ -65,6 +65,8 @@ class Deployer
     $cmds = [
       "cp -rp {$componentRoot}dpw/wire {$componentRoot}dpw/index.php {$componentRoot}dpw/.htaccess {$appRoot}",
       "cp -rp {$componentRoot}dsite/ {$appRoot}site",
+      "mkdir {$appRoot}site/assets/logs",
+      "cp -rp {$appRoot}wire/modules/Inputfield/InputfieldCKEditor {$appRoot}site/modules/",
     ];
     foreach($cmds as $cmd)
     {
