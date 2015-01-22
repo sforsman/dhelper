@@ -9,7 +9,7 @@ class Deployer
   }
 
   // This should be called in composer.json on post-install-cmd
-  public function postInstall()
+  static public function postInstall()
   {
     // TODO: Dev-version (this supports Heroku-buildpack style only)
     if(!getenv('HEROKU_APP_DIR'))
@@ -19,14 +19,14 @@ class Deployer
     if(!file_exists($installLock))
     {
       echo "First-time installation detected\n";
-      $pdo = $this->setupDatabase();
-      $this->setupAdminUser($pdo);
+      $pdo = self::setupDatabase();
+      self::setupAdminUser($pdo);
       touch($installLock);
     }
-    $this->createAppRoot();
+    self::createAppRoot();
   }
 
-  protected function createAppRoot()
+  static protected function createAppRoot()
   {
     $appRoot = getenv('HEROKU_APP_DIR').'/';
     $componentRoot = $appRoot.'vendor/sforsman/';
@@ -42,7 +42,7 @@ class Deployer
     }
   }
 
-  protected function setupDatabase()
+  static protected function setupDatabase()
   {
     $host = getenv('PW_DB_HOST');
     $db = getenv('PW_DB_NAME');
@@ -79,7 +79,7 @@ class Deployer
     return $pdo;
   }
 
-  protected function setupAdminUser($pdo)
+  static protected function setupAdminUser($pdo)
   {
     $user = getenv('PW_ADMIN_USER');
     $pass = getenv('PW_ADMIN_PASS');
@@ -92,7 +92,7 @@ class Deployer
 
     $page_id = $pdo->lastInsertId();
 
-    list($salt,$hash) = $this->getHash($pass);
+    list($salt,$hash) = self::getHash($pass);
 
     $query = "INSERT INTO field_pass VALUES(?,?,?)";
     $stmt = $pdo->prepare($query);
@@ -104,23 +104,23 @@ class Deployer
     echo "-> Admin user created\n";
   }
 
-  protected function getHash($pass)
+  static protected function getHash($pass)
   {
     $site_salt = getenv('PW_SALT');
-    $salt = $this->getSalt();
+    $salt = self::getSalt();
     $hash = crypt($pass . $site_salt, $salt);
     return [substr($hash, 0, 29), substr($hash, 29)];
   }
 
-  protected function getSalt()
+  static protected function getSalt()
   {
     $salt = '$2y$11$';
-    $salt.= $this->randomBase64String(22);
+    $salt.= self::randomBase64String(22);
     $salt.= '$'; 
     return $salt;
   }
 
-  public function randomBase64String($requiredLength = 22) {
+  static protected function randomBase64String($requiredLength = 22) {
     $buffer = '';
     $rawLength = (int) ($requiredLength * 3 / 4 + 1);
     $valid = false;
