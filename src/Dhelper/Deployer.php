@@ -81,7 +81,7 @@ class Deployer
     $options = [
 //      'findReplaceCreateTable'=>[
 //        'ENGINE=MyISAM' => 'ENGINE=InnoDB'
-      ],
+//      ],
     ];
 
     if(!$backup->restoreMerge($wireRoot.'core/install.sql', $siteRoot.'install/install.sql', $options)) {
