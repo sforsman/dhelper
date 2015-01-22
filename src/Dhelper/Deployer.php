@@ -21,15 +21,41 @@ class Deployer
     if(!getenv('PW_DB_HOST'))
       return;
 
-    $installLock = self::getRoot().'/.installed';
-    if(!file_exists($installLock))
+    $master = self::getMasterDb();
+
+    if(self::databaseExists($master))
     {
-      echo "First-time installation detected\n";
-      $pdo = self::setupDatabase();
-      self::setupAdminUser($pdo);
-      touch($installLock);
+      echo "Connecting to existing instance\n";
     }
-    self::createAppRoot();
+    else
+    {
+      $pdo = self::setupDatabase($master);
+      self::setupAdminUser($pdo);
+      self::createAppRoot();
+    }
+  }
+
+  static protected function getMasterDb()
+  {
+    $host = getenv('PW_DB_HOST');
+
+    $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+    return $pdo;
+  }
+
+  static protected function databaseExists($master)
+  {
+    $db = getenv('PW_DB_NAME');
+
+    $query = "SHOW DATABASES LIKE '{$db}'";
+    $result = $master->query($query)->fetch();
+
+    if($result !== false)
+      return true;
+    else
+      return false;
   }
 
   static protected function createAppRoot()
@@ -48,25 +74,15 @@ class Deployer
     }
   }
 
-  static protected function setupDatabase()
+  static protected function setupDatabase($master)
   {
-    $host = getenv('PW_DB_HOST');
-    $db = getenv('PW_DB_NAME');
     $appRoot = self::getRoot().'/';
 
-    $pdo = new \PDO("mysql:host={$host};charset=utf8", getenv('PW_DB_ADMIN_USER'), getenv('PW_DB_ADMIN_PASS'));
-    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $host = getenv('PW_DB_HOST');
+    $db = getenv('PW_DB_NAME');
 
-    $query = "SHOW DATABASES LIKE '{$db}'";
-    $result = $pdo->query($query)->fetch();
-
-    if($result !== false)
-      throw new \Exception("Database '{$db}' exists");
-
-    $pdo->exec("CREATE DATABASE {$db}");
-    $pdo->exec("GRANT ALL PRIVILEGES ON {$db}.* TO '".getenv('PW_DB_USER')."'@'%' IDENTIFIED BY '".getenv('PW_DB_PASS')."'");
-
-    unset($pdo);
+    $master->exec("CREATE DATABASE {$db}");
+    $master->exec("GRANT ALL PRIVILEGES ON {$db}.* TO '".getenv('PW_DB_USER')."'@'%' IDENTIFIED BY '".getenv('PW_DB_PASS')."'");
 
     $pdo = new \PDO("mysql:dbname={$db};host={$host};charset=utf8", getenv('PW_DB_USER'), getenv('PW_DB_PASS'));
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
