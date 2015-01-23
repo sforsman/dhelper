@@ -1,0 +1,83 @@
+#!/usr/bin/env php
+<?php
+
+if(!isset($argv[1]) or !isset($argv[2]))
+{
+  echo "Usage: php ".basename(__FILE__)." <instance> <configuration>\n";
+  exit(1);
+}
+
+$instance = $argv[1];
+$config = $argv[2];
+
+if(!file_exists($config) or !is_readable($config))
+{
+  echo "Configuration file {$config} does not exist\n";
+  exit(4);
+}
+
+$json = json_decode(file_get_contents($config), true);
+if(!$json)
+{
+  echo "Configuration file {$config} is not valid JSON\n";
+  exit(5);
+}
+
+$keys = [
+  'PW_CACHE_HOST',
+  'PW_DB_HOST',
+  'PW_DB_NAME',
+  'PW_DB_ADMIN_USER',
+  'PW_DB_ADMIN_PASS',
+  'PW_DB_USER',
+  'PW_DB_PASS',
+  'PW_ADMIN_USER',
+  'PW_ADMIN_PASS',
+  'PW_SALT',
+  'PW_URL',  
+];
+
+$env = [];
+
+foreach($keys as $key)
+{
+  if(!isset($json[$key]))
+  {
+    echo "Incomplete configuration: {$key} is missing\n";
+    exit(6);
+  }
+  $value = str_replace(["%INSTANCE%", "%SALT%"], [$instance, randomString(32)], $json[$key]);
+  $env[$key] = $value;
+}
+
+passthru("deis create {$instance}", $retval);
+if($retval != 0)
+{
+  echo "Deis creation failed\n";
+  exit(2);
+}
+
+$str = "";
+
+foreach($env as $key=>$value)
+{
+  $str.= $key."=".$value." ";
+}
+
+passthru("deis config:set {$str}", $retval);
+
+if($retval != 0)
+{
+  echo "Deis env failed\n";
+  exit(3);
+}
+
+function randomString($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}

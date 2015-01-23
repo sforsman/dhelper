@@ -1,0 +1,13 @@
+{
+    "PW_CACHE_HOST": "example.cache.amazonaws.com",
+    "PW_DB_HOST": "example.rds.amazonaws.com",
+    "PW_DB_NAME": "%INSTANCE%",
+    "PW_DB_ADMIN_USER": "master",
+    "PW_DB_ADMIN_PASS": "password",
+    "PW_DB_USER": "%INSTANCE%",
+    "PW_DB_PASS": "password",
+    "PW_ADMIN_USER": "admin",
+    "PW_ADMIN_PASS": "password",
+    "PW_SALT": "%SALT%",
+    "PW_URL": "%INSTANCE%.example.com"
+}
