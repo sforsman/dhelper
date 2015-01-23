@@ -120,7 +120,7 @@ class Deployer
 
   static public function deployProfile()
   {
-    if(!file_exists($this->getRoot(). '/.profile.d'))
+    if(!file_exists(self::getRoot(). '/.profile.d'))
     {
       passthru("cp -rp vendor/sforsman/dhelper/contrib/profile.d .profile.d/", $retval);
       if($retval != 0)
