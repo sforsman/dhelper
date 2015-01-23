@@ -118,6 +118,16 @@ class Deployer
     return $pdo;
   }
 
+  static public function deployProfile()
+  {
+    if(!file_exists($this->getRoot(). '/.profile.d'))
+    {
+      passthru("cp -rp vendor/sforsman/dhelper/contrib/profile.d .profile.d/", $retval);
+      if($retval != 0)
+        throw new \Exception("Failed installing profile");
+    }
+  }
+
   static protected function setupAdminUser($pdo)
   {
     $user = getenv('PW_ADMIN_USER');
