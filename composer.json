@@ -17,5 +17,6 @@
     },
     "autoload": {
         "psr-4": {"Dhelper\\": "src/Dhelper"}
-    }
+    },
+    "bin": ["bin/setup_deis_instance"]
 }
