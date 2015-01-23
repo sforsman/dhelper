@@ -10,7 +10,10 @@ class Deployer
 
   static public function getRoot()
   {
-    return "/app";
+    if(!file_exists("/app"))
+      return ".";
+    else
+      return "/app";
   }
 
 
