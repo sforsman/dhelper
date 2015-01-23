@@ -123,9 +123,9 @@ class Deployer
 
   static public function deployProfile()
   {
-    if(!file_exists(self::getRoot() . '/.profile.d'))
+    if(!file_exists('.profile.d'))
     {
-      passthru("cp -rp ".self::getRoot()."/vendor/sforsman/dhelper/contrib/profile.d ".self::getRoot()."/.profile.d/", $retval);
+      passthru("cp -rp vendor/sforsman/dhelper/contrib/profile.d .profile.d/", $retval);
       if($retval != 0)
         throw new \Exception("Failed installing profile");
     }
