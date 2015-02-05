@@ -24,6 +24,7 @@ if(!$json)
 }
 
 $keys = [
+  'PW_CACHE_DRIVER',
   'PW_CACHE_HOST',
   'PW_DB_HOST',
   'PW_DB_NAME',
@@ -34,8 +35,10 @@ $keys = [
   'PW_ADMIN_USER',
   'PW_ADMIN_PASS',
   'PW_SALT',
-  'PW_URL',  
+  'PW_URL',
 ];
+
+// TOOD: Add AWS stuff
 
 $env = [];
 
