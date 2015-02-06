@@ -53,6 +53,12 @@ foreach($keys as $key)
   $env[$key] = $value;
 }
 
+foreach($json as $key=>$value)
+{
+  if(!isset($env[$key]))
+    $env[$key] = $value;
+}
+
 passthru("deis create {$instance}", $retval);
 if($retval != 0)
 {
