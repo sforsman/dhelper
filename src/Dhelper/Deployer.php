@@ -68,7 +68,7 @@ class Deployer
     $cmds = [
       "cp -rp {$componentRoot}dpw/wire {$componentRoot}dpw/index.php {$componentRoot}dpw/.htaccess {$appRoot}",
       "mkdir -p {$appRoot}site/",
-      "rsync --ignore-existing --recursive {$componentRoot}dsite/ {$appRoot}site/",
+      "rsync --ignore-existing --recursive {$componentRoot}dsite/* {$appRoot}site/",
       "mkdir -p {$appRoot}site/assets/logs",
       "cp -rp {$appRoot}wire/modules/Inputfield/InputfieldCKEditor {$appRoot}site/modules/",
     ];
